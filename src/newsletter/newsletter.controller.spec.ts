@@ -1,15 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { NewsletterController } from './newsletter.controller'
-
-import { NewsletterService } from './newsletter.service';
-import { Repository } from 'typeorm'
-import { getRepositoryToken } from '@nestjs/typeorm'
-import { Newsletter } from './entities/newsletter.entity'
+import { NewsletterService } from './newsletter.service'
 
 const mockNewsletterService = {
     create: jest.fn().mockResolvedValue({ isSubscribed: true }),
     update: jest.fn().mockResolvedValue({ isSubscribed: false }),
-};
+}
 
 describe('NewsletterController', () => {
     let controller: NewsletterController
@@ -19,13 +15,12 @@ describe('NewsletterController', () => {
             providers: [
                 {
                     provide: NewsletterService,
-                    useValue: mockNewsletterService
+                    useValue: mockNewsletterService,
                 },
             ],
         }).compile()
 
         controller = module.get<NewsletterController>(NewsletterController)
-        
     })
 
     it('should be defined', () => {
