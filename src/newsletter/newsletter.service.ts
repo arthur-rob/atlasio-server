@@ -1,4 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { 
+    Injectable,
+    NotFoundException, 
+    ConflictException, } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { Newsletter } from './entities/newsletter.entity'
@@ -13,6 +16,8 @@ export class NewsletterService {
     ) {}
 
     async create(dto: CreateNewsletterDto): Promise<Newsletter> {
+        const existing = await this.newsletterRepository.findOneBy({ email: dto.email })
+        if (existing) throw new ConflictException('User is already subscribed')
         const newsletter = this.newsletterRepository.create(dto)
         return this.newsletterRepository.save(newsletter)
     }
