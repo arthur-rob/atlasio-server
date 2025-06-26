@@ -6,6 +6,7 @@ async function bootstrap() {
     const app = await NestFactory.create(AppModule)
     const configService = app.get(ConfigService)
     const origins = configService.get<string>('CORS_ORIGINS') || ''
+    const port = configService.get<string>('PORT') || 3000;
     const originList = origins
         .split(',')
         .map((o) => o.trim())
@@ -20,6 +21,6 @@ async function bootstrap() {
         allowedHeaders: 'Content-Type, Authorization',
     })
 
-    await app.listen(process.env.PORT ?? 3000)
+    await app.listen(port, "0.0.0.0")
 }
 bootstrap()
