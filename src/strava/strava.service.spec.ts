@@ -13,7 +13,7 @@ const mockConfig = {
 
 describe('StravaService', () => {
     let service: StravaService
-    let httpService: { post: jest.Mock; get: jest.Mock }
+    let httpService: { post: jest.Mock<any, any>; get: jest.Mock<any, any> }
     let configService: { get: jest.Mock }
     let logger: { error: jest.Mock }
 

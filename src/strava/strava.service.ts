@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common'
 import { HttpService } from '@nestjs/axios'
 import { firstValueFrom } from 'rxjs'
 import { ConfigService } from '@nestjs/config'
+import { AxiosResponse } from 'axios'
 
 import {
     StravaActivity,
@@ -17,15 +18,15 @@ export class StravaService {
     ) {}
 
     private get clientId(): string {
-        return this.configService.get<string>('STRAVA_CLIENT_ID') || ''
+        return this.configService.get<string>('STRAVA_CLIENT_ID') ?? ''
     }
 
     private get clientSecret(): string {
-        return this.configService.get<string>('STRAVA_CLIENT_SECRET') || ''
+        return this.configService.get<string>('STRAVA_CLIENT_SECRET') ?? ''
     }
 
     private get redirectUri(): string {
-        return this.configService.get<string>('STRAVA_REDIRECT_URI') || ''
+        return this.configService.get<string>('STRAVA_REDIRECT_URI') ?? ''
     }
 
     getAuthRedirectUrl(): string {
@@ -34,35 +35,49 @@ export class StravaService {
 
     async exchangeToken(code: string): Promise<string> {
         try {
-            const res = (await firstValueFrom(
-                this.httpService.post('https://www.strava.com/oauth/token', {
-                    client_id: this.clientId,
-                    client_secret: this.clientSecret,
-                    code,
-                    grant_type: 'authorization_code',
-                }),
-            )) as { data: StravaTokenResponse }
-            return res.data?.access_token
+            const res: AxiosResponse<StravaTokenResponse> =
+                await firstValueFrom(
+                    this.httpService.post<StravaTokenResponse>(
+                        'https://www.strava.com/oauth/token',
+                        {
+                            client_id: this.clientId,
+                            client_secret: this.clientSecret,
+                            code,
+                            grant_type: 'authorization_code',
+                        },
+                    ),
+                )
+            return res.data.access_token
         } catch (error) {
-            this.logger.error(error)
-            throw new Error('Failed to exchange token with Strava')
+            const context = 'Failed to exchange token with Strava'
+            if (error instanceof Error) {
+                this.logger.error(context, error.stack || error.message)
+            } else {
+                this.logger.error(context, JSON.stringify(error))
+            }
+            throw new Error(context)
         }
     }
 
     async getActivities(token: string): Promise<StravaActivity[]> {
         try {
-            const res = await firstValueFrom(
-                this.httpService.get(
+            const res: AxiosResponse<StravaActivity[]> = await firstValueFrom(
+                this.httpService.get<StravaActivity[]>(
                     'https://www.strava.com/api/v3/athlete/activities',
                     {
                         headers: { Authorization: `Bearer ${token}` },
                     },
                 ),
             )
-            return res.data as StravaActivity[]
+            return res.data
         } catch (error) {
-            this.logger.error(error)
-            throw new Error('Failed to fetch activities from Strava')
+            const context = 'Failed to fetch activities from Strava'
+            if (error instanceof Error) {
+                this.logger.error(context, error.stack || error.message)
+            } else {
+                this.logger.error(context, JSON.stringify(error))
+            }
+            throw new Error(context)
         }
     }
 }
