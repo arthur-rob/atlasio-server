@@ -4,6 +4,7 @@ import { AppService } from './app.service'
 import { NewsletterModule } from './newsletter/newsletter.module'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { ConfigModule, ConfigService } from '@nestjs/config'
+import { StravaModule } from './strava/strava.module'
 
 @Module({
     imports: [
@@ -28,6 +29,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
             }),
         }),
         NewsletterModule,
+        StravaModule,
     ],
     controllers: [AppController],
     providers: [AppService],
