@@ -11,10 +11,10 @@ import {
 
 @Injectable()
 export class StravaService {
+    private readonly logger = new Logger(StravaService.name)
     constructor(
         private readonly httpService: HttpService,
         private readonly configService: ConfigService,
-        private readonly logger: Logger,
     ) {}
 
     private get clientId(): string {
@@ -47,6 +47,7 @@ export class StravaService {
                         },
                     ),
                 )
+            this.logger.log(res.data)
             return res.data.access_token
         } catch (error) {
             const context = 'Failed to exchange token with Strava'

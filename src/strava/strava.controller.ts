@@ -24,11 +24,11 @@ export class StravaController {
         const origin = originList[0] || ''
 
         res.send(`
-        <script>
-            window.opener.postMessage({ token: "${accessToken}" }, "${origin}");
-            window.close();
-        </script>
-      `)
+            <script>
+                window.opener.postMessage({ token: "${accessToken}" }, "${origin}");
+                window.close();
+            </script>
+        `)
     }
 
     @Get('activities')
