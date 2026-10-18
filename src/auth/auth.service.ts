@@ -14,7 +14,7 @@ export class AuthService {
         email: string,
         password: string,
     ): Promise<UserObject | null> {
-        const user = this.usersService.findOne(email)
+        const user = await this.usersService.findOne(email)
         if (!user || !user.password) return null
 
         const isMatch = await bcrypt.compare(password, user.password)
@@ -29,7 +29,7 @@ export class AuthService {
         password: string,
     ): Promise<{ access_token: string; user: UserObject }> {
         const hashed = await bcrypt.hash(password, 10)
-        const user = this.usersService.create({ email, password: hashed })
+        const user = await this.usersService.create({ email, password: hashed })
         const { password: _pw, ...userWithoutPassword } = user
         return this.login(userWithoutPassword)
     }
